@@ -56,12 +56,12 @@ spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
 * ### Clona el repositorio
 
 ```bash
-    git clone url
+    git clone https://github.com/Ricardo-Vega01/users-managment.git
 ```
 * ### Entra al proyecto
 
 ```bash
-    cd proyect
+    cd users-managment
 ```
 
 * ###  Complila e instala dependencias
