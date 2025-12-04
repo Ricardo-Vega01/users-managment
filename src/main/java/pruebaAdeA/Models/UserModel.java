@@ -1,8 +1,11 @@
 package pruebaAdeA.Models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -40,24 +43,17 @@ public class UserModel {
 
     private LocalDate fechaRevocado;
 
-    @Column(nullable = false)
-    private int intentos = 0;
-
-    @Column(nullable = false)
-    private int noAccesos = 0;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 1)
     private StatusUserModel status = StatusUserModel.A;
 
     // Relations
     @ManyToOne
-    @JoinColumn(name = "area_id", nullable = false)
+    @JoinColumn(name = "area_id", nullable = true)
     private AreaModel area;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id", nullable = false)
-    private ClientModel cliente;
+    @OneToMany(mappedBy = "creadoPor", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<ClientModel> clientesRegistrados = new ArrayList<>();
 
     // Empty Constructor
     public UserModel(){}
@@ -159,22 +155,6 @@ public class UserModel {
         this.fechaRevocado = fechaRevocado;
     }
 
-    public int getIntentos() {
-        return intentos;
-    }
-
-    public void setIntentos(int intentos) {
-        this.intentos = intentos;
-    }
-
-    public int getNoAccesos() {
-        return noAccesos;
-    }
-
-    public void setNoAccesos(int noAccesos) {
-        this.noAccesos = noAccesos;
-    }
-
     public StatusUserModel getStatus() {
         return status;
     }
@@ -191,12 +171,13 @@ public class UserModel {
         this.area = area;
     }
 
-    public ClientModel getCliente() {
-        return cliente;
+    public List<ClientModel> getClientesRegistrados() {
+        return clientesRegistrados;
     }
 
-    public void setCliente(ClientModel cliente) {
-        this.cliente = cliente;
+    public void setClientesRegistrados(List<ClientModel> clientesRegistrados){
+        this.clientesRegistrados = clientesRegistrados;
     }
+
 }
 

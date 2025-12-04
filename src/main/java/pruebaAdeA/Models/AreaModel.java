@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class AreaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer area_id;
 
     @Column(nullable = false)
     private String nombreArea;
@@ -23,11 +23,11 @@ public class AreaModel {
     public AreaModel(){}
 
     // Setters y Getters
-    public Integer getId() {
-        return id;
+    public Integer getArea_id() {
+        return area_id;
     }
-    public void setId(Integer id) {
-        this.id = id;
+    public void setArea_id(Integer area_id) {
+        this.area_id = area_id;
     }
 
     public String getNombreArea() {

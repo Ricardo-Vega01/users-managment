@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService{
     // Create User
     @Override
     public UserResponseDto createUser(UserRequestDto request) {
-        // validate dtos
+        // validate email
         if (userRepository.existsByLogin(request.getLogin())){
             throw new RuntimeException("Este login ya existe");
         }
@@ -45,14 +45,7 @@ public class UserServiceImpl implements UserService{
             throw new RuntimeException("El correo ya existe");
         }
 
-        // Get area & clients
-        AreaModel area = areaRepository.findById(request.getAreaId())
-                .orElseThrow(() -> new RuntimeException("Área no encontrada"));
-
-        ClientModel client = clientRepository.findById(request.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-
-        // SET DATA
+        // Set data
         UserModel user = new UserModel();
 
         user.setLogin(request.getLogin());
@@ -61,19 +54,44 @@ public class UserServiceImpl implements UserService{
         user.setApellidoPaterno(request.getApellidoPaterno());
         user.setApellidoMaterno(request.getApellidoMaterno());
         user.setEmail(request.getEmail());
-        user.setArea(area);
-        user.setFechaAlta(LocalDate.now());
         user.setStatus(StatusUserModel.A);
-        user.setCliente(client);
+        user.setFechaAlta(LocalDate.now());
 
-        // validate end dates
-        if (request.getFechaVigencia() != null && request.getFechaVigencia().isEmpty()){
-            user.setFechaVigencia(LocalDate.parse(request.getFechaVigencia()));
+        UserModel saved = userRepository.save(user);
+
+        return mapToDTO(saved);
+    }
+
+    @Override
+    public UserResponseDto createFullUser(UserRequestDto request) {
+        // validate email
+        if (userRepository.existsByLogin(request.getLogin())){
+            throw new RuntimeException("Este login ya existe");
         }
 
-        UserModel save = userRepository.save(user);
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new RuntimeException("El correo ya existe");
+        }
+        // Validate area
+        AreaModel area = areaRepository.findById(request.getAreaId())
+                .orElseThrow(() -> new RuntimeException("Área no encontrada"));
+        // Set data
+        UserModel user = new UserModel();
 
-        return mapToDTO(save);
+        user.setLogin(request.getLogin());
+        user.setPassword(PasswordUtil.encrypt(request.getPassword()));
+        user.setNombre(request.getNombre());
+        user.setApellidoPaterno(request.getApellidoPaterno());
+        user.setApellidoMaterno(request.getApellidoMaterno());
+        user.setEmail(request.getEmail());
+        user.setStatus(StatusUserModel.A);
+        user.setFechaAlta(LocalDate.now());
+        user.setFechaVigencia(request.getFechaVigencia());
+        user.setArea(area);
+
+        UserModel saved = userRepository.save(user);
+
+        return mapToDTO(saved);
     }
 
     @Override
@@ -108,14 +126,9 @@ public class UserServiceImpl implements UserService{
         AreaModel area = areaRepository.findById(request.getAreaId())
                 .orElseThrow(() -> new RuntimeException("Area no encontrada"));
 
-        ClientModel client = clientRepository.findById(request.getClienteId())
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
-
         user.setArea(area);
-        user.setCliente(client);
-
-        if (request.getFechaVigencia() != null && !request.getFechaVigencia().isEmpty()) {
-            user.setFechaVigencia(LocalDate.parse(request.getFechaVigencia()));
+        if (request.getFechaVigencia() != null) {
+            user.setFechaVigencia(user.getFechaVigencia());
         }
 
         UserModel update = userRepository.save(user);
@@ -152,10 +165,12 @@ public class UserServiceImpl implements UserService{
         return users.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    // calidate login
     @Override
-    public boolean validateLogin(String login, Integer id) {
-        return !userRepository.existsByLogin(login);
+    public List<UserResponseDto> listAllUser() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
     }
 
     // validate email
@@ -164,41 +179,6 @@ public class UserServiceImpl implements UserService{
         return !userRepository.existsByEmail(email);
     }
 
-    // Login
-    @Override
-    public UserResponseDto login(String loginEmail, String password) {
-        UserModel user = userRepository.findByLogin(loginEmail)
-                .orElseGet(() -> userRepository.findByEmail(loginEmail)
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado")));
-
-        // validate password
-        String passEncrypt = PasswordUtil.encrypt(password);
-        if (!user.getPassword().equals(passEncrypt)) {
-            user.setIntentos(user.getIntentos() + 1);
-            userRepository.save(user);
-            throw new RuntimeException("Contraseña incorrecta");
-        }
-
-        // validate status
-        if (user.getStatus() != StatusUserModel.A) {
-            throw new RuntimeException("Usuario no activo");
-        }
-
-        // validate date
-        if (user.getFechaVigencia() != null && user.getFechaVigencia().isBefore(LocalDate.now())) {
-            user.setStatus(StatusUserModel.R);
-            user.setFechaRevocado(LocalDate.now());
-            userRepository.save(user);
-            throw new RuntimeException("Usuario vencido / revocado");
-        }
-
-        // success login
-        user.setIntentos(0);
-        user.setNoAccesos(user.getNoAccesos() + 1);
-        userRepository.save(user);
-
-        return mapToDTO(user);
-    }
 
     // Relation Entity - DTO
     private UserResponseDto mapToDTO(UserModel user){
@@ -213,7 +193,14 @@ public class UserServiceImpl implements UserService{
         dto.setFechaVigencia(user.getFechaVigencia() != null ? user.getFechaVigencia().toString() : null);
 
         if (user.getArea() != null) dto.setAreaNombre(user.getArea().getNombreArea());
-        if (user.getCliente() != null) dto.setClienteNombre(user.getCliente().getNombreCliente());
+        if (user.getClientesRegistrados() != null && !user.getClientesRegistrados().isEmpty()) {
+            List<String> nombres = user.getClientesRegistrados()
+                    .stream()
+                    .map(ClientModel::getNombreCliente)
+                    .collect(Collectors.toList());
+            dto.setClienteNombre(nombres);
+        }
+
 
         return  dto;
     }

@@ -1,37 +1,41 @@
 package pruebaAdeA.Controllers;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 import pruebaAdeA.Dtos.Request.LoginRequestDto;
 import pruebaAdeA.Dtos.Response.LoginResponseDto;
-import pruebaAdeA.Dtos.Response.UserResponseDto;
-import pruebaAdeA.Services.Users.UserService;
+import pruebaAdeA.Services.Login.LoginService;
+
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "*")
 public class AuthController {
-    private final UserService userService;
+    private final LoginService loginService;
 
-    // constructor
-    public AuthController(UserService userService){
-        this.userService = userService;
+    // Empty constructor
+    public AuthController(LoginService loginService){
+        this.loginService = loginService;
     }
 
     @PostMapping("/login")
-    public LoginResponseDto login(@RequestBody LoginRequestDto request){
+    public LoginResponseDto login(@RequestBody LoginRequestDto request, HttpServletRequest httpRequest) {
         LoginResponseDto response = new LoginResponseDto();
 
-        try{
-            UserResponseDto user = userService.login(request.getLogin(), request.getPassword());
-            response.setSuccess(true);
-            response.setUsuario(user);
+        try {
+            response = loginService.login(request, httpRequest);
         } catch (RuntimeException e) {
             response.setSuccess(false);
             response.setMessage(e.getMessage());
         }
+
         return response;
+    }
+
+    @GetMapping("/history/{userId}")
+    public List<LoginResponseDto> getLoginHistory(@PathVariable Integer userId) {
+        return loginService.getLoginHistoryByUser(userId);
     }
 }

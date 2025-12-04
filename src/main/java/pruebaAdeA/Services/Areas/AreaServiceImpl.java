@@ -6,7 +6,9 @@ import pruebaAdeA.Dtos.Response.AreaResponseDto;
 import pruebaAdeA.Models.AreaModel;
 import pruebaAdeA.Repositories.AreaRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+
 import java.util.stream.Collectors;
 @Service
 public class AreaServiceImpl implements AreaService{
@@ -21,9 +23,15 @@ public class AreaServiceImpl implements AreaService{
     @Override
     public AreaResponseDto createArea(AreaRequestDto request) {
         AreaModel area = new AreaModel();
-        area.setNombreArea(request.getNombreArea());
+        area.setNombreArea(request.getNombre());
+        area.setCodigoInterno(request.getDescripcion());
+        area.setFechaAlta(LocalDate.now());
 
-        return mapToDTO(area);
+        // Guardar en BD
+        AreaModel savedArea = areaRepository.save(area);
+
+        System.out.println("savedArea = " + savedArea);
+        return mapToDTO(savedArea);
     }
 
     @Override
@@ -31,14 +39,21 @@ public class AreaServiceImpl implements AreaService{
         AreaModel area = areaRepository.findById(id)
                 .orElseThrow(()->new RuntimeException("El area no existe"));
 
-        area.setNombreArea(request.getNombreArea());
+        area.setNombreArea(request.getNombre());
+        area.setCodigoInterno(request.getDescripcion());
 
-        return mapToDTO(area);
+        AreaModel upload = areaRepository.save(area);
+
+        return mapToDTO(upload);
     }
 
     @Override
     public void deleteArea(Integer id) {
-        areaRepository.findById(id);
+        if (areaRepository.existsById(id)){
+            areaRepository.deleteById(id);
+        }else{
+            throw new RuntimeException("Area: " + id + "no encontrada");
+        }
     }
 
     @Override
@@ -54,11 +69,13 @@ public class AreaServiceImpl implements AreaService{
         return areaRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
+    // Match data whit request and response dto
     private AreaResponseDto mapToDTO(AreaModel area){
         AreaResponseDto dto = new AreaResponseDto();
-        dto.setId(area.getId());
+        dto.setId(area.getArea_id());
         dto.setNombreArea(area.getNombreArea());
-
+        dto.setCodigoInterno(area.getCodigoInterno());
+        dto.setFechaAlta(area.getFechaAlta());
         return dto;
     }
 }

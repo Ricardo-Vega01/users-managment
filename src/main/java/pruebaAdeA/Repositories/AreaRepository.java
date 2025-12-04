@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface AreaRepository extends JpaRepository<AreaModel, Integer> {
     Optional<AreaModel> findByNombreArea(String nombreArea);
+
+
 }

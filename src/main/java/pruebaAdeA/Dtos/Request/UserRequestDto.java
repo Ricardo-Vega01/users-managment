@@ -1,7 +1,8 @@
 package pruebaAdeA.Dtos.Request;
 
-public class UserRequestDto {
+import java.time.LocalDate;
 
+public class UserRequestDto {
     // user data
     private String login;
     private String password;
@@ -9,16 +10,13 @@ public class UserRequestDto {
     private String apellidoPaterno;
     private String apellidoMaterno;
     private String email;
-    private String fechaVigencia;
+    private LocalDate fechaVigencia;
 
     // fk - area
     private Integer areaId;
 
-    // fk - client
-    private Integer clientId;
-
     // Empty constructor
-    public UserRequestDto(){}
+    public UserRequestDto() {}
 
     // Getters y Setters
     public String getLogin() { return login; }
@@ -39,13 +37,10 @@ public class UserRequestDto {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+    public LocalDate getFechaVigencia() { return fechaVigencia; }
+    public void setFechaVigencia(LocalDate fechaVigencia) { this.fechaVigencia = fechaVigencia; }
+
     public Integer getAreaId() { return areaId; }
     public void setAreaId(Integer areaId) { this.areaId = areaId; }
-
-    public Integer getClienteId() { return clientId; }
-    public void setClienteId(Integer clienteId) { this.clientId = clienteId; }
-
-    public String getFechaVigencia() { return fechaVigencia; }
-    public void setFechaVigencia(String fechaVigencia) { this.fechaVigencia = fechaVigencia; }
 
 }

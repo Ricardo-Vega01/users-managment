@@ -1,5 +1,9 @@
 package pruebaAdeA.Dtos.Response;
 
+import pruebaAdeA.Models.ClientModel;
+
+import java.util.List;
+
 public class UserResponseDto {
 
     private Integer id;
@@ -12,7 +16,7 @@ public class UserResponseDto {
 
     // match fk
     private String areaNombre;
-    private String clienteNombre;
+    private List<String> clienteNombre;
 
     // Empty constructor
     public UserResponseDto(){}
@@ -42,7 +46,11 @@ public class UserResponseDto {
     public String getAreaNombre() { return areaNombre; }
     public void setAreaNombre(String areaNombre) { this.areaNombre = areaNombre; }
 
-    public String getClienteNombre() { return clienteNombre; }
-    public void setClienteNombre(String clienteNombre) { this.clienteNombre = clienteNombre; }
+    public List<String> getClienteNombre() {
+        return clienteNombre;
+    }
 
+    public void setClienteNombre(List<String> clienteNombre) {
+        this.clienteNombre = clienteNombre;
+    }
 }

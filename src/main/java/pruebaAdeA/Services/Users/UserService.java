@@ -7,8 +7,11 @@ import pruebaAdeA.Models.StatusUserModel;
 import java.util.List;
 
 public interface UserService {
-    // Create user
+    // Create Temp user
     UserResponseDto createUser(UserRequestDto request);
+
+    // Create user
+    UserResponseDto createFullUser(UserRequestDto request);
 
     // Update user
     UserResponseDto updateUser(Integer id, UserRequestDto request);
@@ -22,13 +25,8 @@ public interface UserService {
     // List users by status
     List<UserResponseDto> listUserByStatus(StatusUserModel status);
 
-    // Validate unique login
-    boolean validateLogin(String login, Integer id);
+    List<UserResponseDto> listAllUser();
 
     // Validate unique email
     boolean validateEmail(String email, Integer id);
-
-    // login
-    UserResponseDto login(String loginEmail, String password);
-
 }

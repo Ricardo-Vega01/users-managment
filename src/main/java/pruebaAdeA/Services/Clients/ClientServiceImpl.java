@@ -25,16 +25,17 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public ClientResponseDto createClient(ClientRequestDto request) {
-        UserModel created = userRepository.findById(request.getCreadorId())
-                .orElseThrow(()->new RuntimeException("El usuario no existe"));
+        UserModel created = userRepository.findById(1)
+                .orElseThrow(() -> new RuntimeException("Usuario creador por defecto no existe"));
 
         ClientModel client = new ClientModel();
-
         client.setNombreCliente(request.getNombreCliente());
-        client.setCreadoPor(created);
         client.setDescripcion(request.getDescripcion());
+        client.setCreadoPor(created);
         client.setFechaAlta(LocalDate.now());
-        return mapToDTO(client);
+
+        ClientModel saved = clientRepository.save(client);
+        return mapToDTO(saved);
     }
 
     @Override
@@ -49,7 +50,10 @@ public class ClientServiceImpl implements ClientService{
             UserModel created = userRepository.findById(request.getCreadorId())
                     .orElseThrow(()->new RuntimeException("El usuario no existe"));
         }
-         return mapToDTO(client);
+
+        ClientModel update = clientRepository.save(client);
+
+        return mapToDTO(update);
     }
 
     @Override
@@ -62,7 +66,7 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public void deleteClient(Integer id) {
-         clientRepository.findById(id);
+         clientRepository.deleteById(id);
     }
 
     @Override
@@ -72,19 +76,24 @@ public class ClientServiceImpl implements ClientService{
 
     @Override
     public List<ClientResponseDto> getClientsByUser(Integer userId) {
-        return clientRepository.findByCreadoPor(userId).stream().map(this::mapToDTO).collect(Collectors.toList());
+        return clientRepository.findByCreadoPorId(userId).stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    private ClientResponseDto mapToDTO(ClientModel client){
+    private ClientResponseDto mapToDTO(ClientModel client) {
         ClientResponseDto dto = new ClientResponseDto();
 
-        dto.setId(dto.getId());
-        dto.setNombreCliente(dto.getNombreCliente());
-        dto.setDescripcion(dto.getDescripcion());
-        if (client.getCreadoPor()!=null){
-            dto.setCreadorNombre(client.getCreadoPor().getNombre() + " " + client.getCreadoPor().getApellidoMaterno());
+        dto.setId(client.getId());
+        dto.setNombreCliente(client.getNombreCliente());
+        dto.setDescripcion(client.getDescripcion());
+        dto.setFechaAlta(client.getFechaAlta());
+
+        if (client.getCreadoPor() != null) {
+            dto.setCreadorNombre(
+                    client.getCreadoPor().getNombre() + " " + client.getCreadoPor().getApellidoMaterno()
+            );
         }
 
         return dto;
     }
+
 }

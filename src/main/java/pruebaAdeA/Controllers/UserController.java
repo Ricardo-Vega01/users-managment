@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
     private final UserService userService;
@@ -20,13 +21,19 @@ public class UserController {
     }
 
     // create user
-    @PostMapping
+    @PostMapping(value = "/basic", consumes = "application/json", produces = "application/json")
     public UserResponseDto createUser(@RequestBody UserRequestDto request){
         return userService.createUser(request);
     }
 
+    // create Full user
+    @PostMapping(value = "/full", consumes = "application/json", produces = "application/json")
+    public  UserResponseDto createFullUser(@RequestBody UserRequestDto request){
+        return  userService.createFullUser(request);
+    }
+
     // update user
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public UserResponseDto updateUser(@PathVariable Integer id, @RequestBody UserRequestDto request){
         return userService.updateUser(id, request);
     }
@@ -44,9 +51,15 @@ public class UserController {
     }
 
     // list users
-    @GetMapping
+
+    /*@GetMapping
     public List<UserResponseDto> listUsers(@RequestParam(required = false) String status){
         StatusUserModel statusEnum = status != null  ? StatusUserModel.valueOf(status.toUpperCase()):null;
         return statusEnum != null ? userService.listUserByStatus(statusEnum) : userService.listUserByStatus(StatusUserModel.A);
+    }
+    */
+    @GetMapping
+    public List<UserResponseDto> allUser(){
+        return userService.listAllUser();
     }
 }

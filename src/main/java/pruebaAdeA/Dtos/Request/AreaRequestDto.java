@@ -1,17 +1,21 @@
 package pruebaAdeA.Dtos.Request;
 
 public class AreaRequestDto {
-    private String nombreArea;
+    private String nombre;      // coincide con el front
+    private String descripcion; // coincide con el front
 
-    //Empty Constructor
-    public AreaRequestDto(){}
+    //Empty constructor
+    AreaRequestDto(){}
 
-    // Getters y Setters
-    public String getNombreArea(){
-        return nombreArea;
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
+
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setNombreArea(String nombreArea) {
-        this.nombreArea = nombreArea;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 }
+
